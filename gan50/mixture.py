@@ -16,8 +16,9 @@ import seaborn as sns
 sns.set(color_codes=True)
 
 # Data params
-data_mean = 4
-data_stddev = 1.25
+p_pi = [0.3, 0.3, 0.4]
+data_mean = [-8,3,8]
+data_stddev = [1.25,2,3]
 
 # Model params
 g_input_size = 1     # Random noise dimension coming into generator, per output vector
@@ -46,7 +47,16 @@ print("Using data [%s]" % (name))
 # ##### DATA: Target data and generator input data
 
 def get_distribution_sampler(mu, sigma):
-    return lambda n: torch.Tensor(np.random.normal(mu, sigma, (n,1)))  # Gaussian
+    def truc():
+        theta=np.random.rand(1)
+        if (theta <= p_pi[0]):
+            return torch.Tensor(np.random.normal(data_mean[0], data_stddev[0], (1)))
+        elif (theta <= p_pi[0] + p_pi[1]):
+            return torch.Tensor(np.random.normal(data_mean[1], data_stddev[1], (1)))
+        else:
+            return torch.Tensor(np.random.normal(data_mean[2], data_stddev[2], (1))) 
+    ipdb.set_trace()
+    return lambda n: torch.stack([truc() for i in range(n)])
 
 def get_generator_input_sampler():
     return lambda m, n: torch.rand(m, n)  # Uniform-dist data into generator, _NOT_ Gaussian
